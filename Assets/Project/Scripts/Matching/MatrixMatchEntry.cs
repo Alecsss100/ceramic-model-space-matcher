@@ -6,7 +6,7 @@ public class MatrixMatchEntry : MonoBehaviour
 
     void Awake()
     {
-        _matcher = new ShiftModelSpaceMatcher();
+        _matcher = new BruteForceShiftModelSpaceMatcher();
     }
 
     void Start()
@@ -15,6 +15,6 @@ public class MatrixMatchEntry : MonoBehaviour
         var space = MatrixJsonLoader.Load("Data/space");
 
         var result = _matcher.Find(model, space);
-        Debug.Log($"{_matcher.Name}: смещений найдено — {result.TranslationOffsets.Count}");
+        Debug.Log($"{_matcher.Name}: смещений найдено - {result.Offsets.Count}");
     }
 }

@@ -3,5 +3,5 @@ using UnityEngine;
 
 public class MatchResult
 {
-    public List<Vector3> TranslationOffsets { get; } = new();
+    public List<Matrix4x4> Offsets { get; } = new();
 }
