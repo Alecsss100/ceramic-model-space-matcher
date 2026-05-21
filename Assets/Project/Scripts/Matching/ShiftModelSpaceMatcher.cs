@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class ShiftModelSpaceMatcher : IModelSpaceMatcher
@@ -8,9 +9,17 @@ public class ShiftModelSpaceMatcher : IModelSpaceMatcher
     {
         var result = new MatchResult();
 
-        // TODO реалиазовать алгоритм матчинга
-        Debug.Log("ShiftModelSpaceMatcher: алгоритм матчинга в процессе реализации");
+        foreach (var step in FindSteps(model, space))
+        {
+            if (step.Kind == MatchStepKind.Accepted)
+                result.Offsets.Add(step.Offset);
+        }
 
         return result;
+    }
+
+    public IEnumerable<MatchStep> FindSteps(Matrix4x4[] model, Matrix4x4[] space)
+    {
+        yield break;
     }
 }

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class BruteForceShiftModelSpaceMatcher : IModelSpaceMatcher
@@ -15,27 +16,48 @@ public class BruteForceShiftModelSpaceMatcher : IModelSpaceMatcher
     {
         var result = new MatchResult();
 
-        // edge кейсы
+        foreach (var step in FindSteps(model, space))
+        {
+            if (step.Kind == MatchStepKind.Accepted)
+                result.Offsets.Add(step.Offset);
+        }
+
+        return result;
+    }
+
+    public IEnumerable<MatchStep> FindSteps(Matrix4x4[] model, Matrix4x4[] space)
+    {
         if (model == null || model.Length == 0 || space == null || space.Length == 0)
         {
             Debug.LogWarning($"{nameof(BruteForceShiftModelSpaceMatcher)}: пустые входные данные");
-            return result;
+            yield break;
         }
 
+        var foundOffsets = new List<Matrix4x4>();
         var anchorInverse = model[0].inverse;
 
         for (var spaceIndex = 0; spaceIndex < space.Length; spaceIndex++)
         {
             var offset = space[spaceIndex] * anchorInverse;
 
-            if (ContainsOffset(result, offset))
+            if (ContainsOffset(foundOffsets, offset))
+            {
+                yield return new MatchStep(MatchStepKind.SkippedDuplicate, spaceIndex, offset);
                 continue;
+            }
+
+            yield return new MatchStep(MatchStepKind.Candidate, spaceIndex, offset);
 
             if (MatchesAllModelMatrices(model, space, offset))
-                result.Offsets.Add(offset);
+            {
+                foundOffsets.Add(offset);
+                yield return new MatchStep(MatchStepKind.Accepted, spaceIndex, offset);
+            }
+            else
+            {
+                yield return new MatchStep(MatchStepKind.Rejected, spaceIndex, offset);
+            }
         }
-
-        return result;
     }
 
     bool MatchesAllModelMatrices(Matrix4x4[] model, Matrix4x4[] space, Matrix4x4 offset)
@@ -62,11 +84,11 @@ public class BruteForceShiftModelSpaceMatcher : IModelSpaceMatcher
         return false;
     }
 
-    bool ContainsOffset(MatchResult result, Matrix4x4 offset)
+    bool ContainsOffset(List<Matrix4x4> offsets, Matrix4x4 offset)
     {
-        for (var i = 0; i < result.Offsets.Count; i++)
+        for (var i = 0; i < offsets.Count; i++)
         {
-            if (result.Offsets[i].Approximately(offset, _epsilon))
+            if (offsets[i].Approximately(offset, _epsilon))
                 return true;
         }
 
