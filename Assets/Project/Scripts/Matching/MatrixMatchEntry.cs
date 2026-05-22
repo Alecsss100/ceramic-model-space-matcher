@@ -1,35 +1,24 @@
 using System.Collections;
 using UnityEngine;
+using VContainer;
 
 public class MatrixMatchEntry : MonoBehaviour
 {
-    [SerializeField] bool _runStepByStep = true;
-    [SerializeField] bool _enableVisualization = true;
-
     IModelSpaceMatcher _matcher;
     IMatchStepPlayback _stepPlayback;
+    MatchRunOptions _options;
 
-    void Awake()
+    [Inject]
+    public void Construct(MatchContext context, MatchRunOptions options)
     {
-        var inner = new OffsetModelSpaceMatcher();
-
-        if (_enableVisualization && _runStepByStep)
-        {
-            var timed = new TimedModelSpaceMatcherDecorator(
-                new VisualizingModelSpaceMatcherDecorator(inner, new MatchStepCubeVisualizer(transform, 100)),
-                new MatchStepTiming());
-            _matcher = timed;
-            _stepPlayback = timed;
-        }
-        else
-        {
-            _matcher = inner;
-        }
+        _matcher = context.Matcher;
+        _stepPlayback = context.StepPlayback;
+        _options = options;
     }
 
-    void Start()
+    public void Run()
     {
-        if (_runStepByStep)
+        if (_options.RunStepByStep)
             StartCoroutine(RunStepByStep());
         else
             RunInstant();

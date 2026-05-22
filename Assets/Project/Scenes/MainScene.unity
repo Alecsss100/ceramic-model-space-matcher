@@ -128,28 +128,14 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 215543847}
-  - component: {fileID: 215543846}
+  - component: {fileID: 215543848}
   m_Layer: 0
-  m_Name: Match EntryPoint
+  m_Name: MainLifetimeScope
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &215543846
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 215543845}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e4b8f04fb69ed493a992fbe959cfb8b7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MatrixMatchEntry
-  _runStepByStep: 1
-  _enableVisualization: 1
 --- !u!4 &215543847
 Transform:
   m_ObjectHideFlags: 0
@@ -165,6 +151,24 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &215543848
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 215543845}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f2a8c91d4e6b7503a9c1d2e3f4a5b6c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MainLifetimeScope
+  parentReference:
+    TypeName: 
+  autoRun: 1
+  autoInjectGameObjects: []
+  _runStepByStep: 1
+  _enableVisualization: 1
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0
