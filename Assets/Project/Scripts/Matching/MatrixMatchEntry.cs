@@ -3,14 +3,28 @@ using UnityEngine;
 
 public class MatrixMatchEntry : MonoBehaviour
 {
-    [SerializeField] float _stepDelay = 0.05f;
     [SerializeField] bool _runStepByStep = true;
+    [SerializeField] bool _enableVisualization = true;
 
     IModelSpaceMatcher _matcher;
+    IMatchStepPlayback _stepPlayback;
 
     void Awake()
     {
-        _matcher = new BruteForceShiftModelSpaceMatcher();
+        var inner = new BruteForceShiftModelSpaceMatcher();
+
+        if (_enableVisualization && _runStepByStep)
+        {
+            var timed = new TimedModelSpaceMatcherDecorator(
+                new VisualizingModelSpaceMatcherDecorator(inner, new MatchStepCubeVisualizer(transform, 100)),
+                new MatchStepTiming());
+            _matcher = timed;
+            _stepPlayback = timed;
+        }
+        else
+        {
+            _matcher = inner;
+        }
     }
 
     void Start()
@@ -26,8 +40,7 @@ public class MatrixMatchEntry : MonoBehaviour
         var model = MatrixJsonLoader.Load("Data/model");
         var space = MatrixJsonLoader.Load("Data/space");
 
-        var result = _matcher.Find(model, space);
-        Debug.Log($"{_matcher.Name}: смещений найдено — {result.Offsets.Count}");
+        Debug.Log($"{_matcher.Name}: смещений найдено — {_matcher.Find(model, space).Offsets.Count}");
     }
 
     IEnumerator RunStepByStep()
@@ -37,30 +50,22 @@ public class MatrixMatchEntry : MonoBehaviour
 
         var acceptedCount = 0;
 
-        foreach (var step in _matcher.FindSteps(model, space))
+        if (_stepPlayback != null)
+            yield return _stepPlayback.PlayFindSteps(model, space, step => TrackStepLog(step, ref acceptedCount));
+        else
         {
-            LogStep(step);
-
-            if (step.Kind == MatchStepKind.Accepted)
-                acceptedCount++;
-
-            yield return new WaitForSeconds(_stepDelay);
+            foreach (var step in _matcher.FindSteps(model, space))
+                TrackStepLog(step, ref acceptedCount);
         }
 
         Debug.Log($"{_matcher.Name}: пошаговый режим завершен, смещений найдено — {acceptedCount}");
     }
 
-    static void LogStep(MatchStep step)
+    static void TrackStepLog(MatchStep step, ref int acceptedCount)
     {
-        var message = step.Kind switch
-        {
-            MatchStepKind.Candidate => $"space[{step.SpaceIndex}]: проверка кандидата",
-            MatchStepKind.SkippedDuplicate => $"space[{step.SpaceIndex}]: дубликат, пропуск",
-            MatchStepKind.Rejected => $"space[{step.SpaceIndex}]: не подошло",
-            MatchStepKind.Accepted => $"space[{step.SpaceIndex}]: найдено смещение",
-            _ => $"space[{step.SpaceIndex}]: {step.Kind}"
-        };
+        Debug.Log($"space[{step.SpaceIndex}]: {MatchStepColors.GetLabel(step.Kind)}");
 
-        Debug.Log(message);
+        if (step.Kind == MatchStepKind.Accepted)
+            acceptedCount++;
     }
 }

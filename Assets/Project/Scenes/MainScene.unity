@@ -148,8 +148,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e4b8f04fb69ed493a992fbe959cfb8b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MatrixMatchEntry
-  _stepDelay: 0.005
+  _stepTiming:
+    _candidate: 0.001
+    _skippedDuplicate: 0.001
+    _rejected: 0.001
+    _accepted: 5
   _runStepByStep: 1
+  _enableVisualization: 1
 --- !u!4 &215543847
 Transform:
   m_ObjectHideFlags: 0
@@ -159,7 +164,7 @@ Transform:
   m_GameObject: {fileID: 215543845}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -17.57516, y: -23.08429, z: -31.1169}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
