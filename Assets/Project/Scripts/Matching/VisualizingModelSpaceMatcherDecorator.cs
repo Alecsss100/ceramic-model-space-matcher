@@ -29,12 +29,17 @@ public class VisualizingModelSpaceMatcherDecorator : IModelSpaceMatcher
 
     public IEnumerable<MatchStep> FindSteps(Matrix4x4[] model, Matrix4x4[] space)
     {
-        foreach (var step in _inner.FindSteps(model, space))
+        try
         {
-            _visualizer.ShowStep(step, model, space);
-            yield return step;
+            foreach (var step in _inner.FindSteps(model, space))
+            {
+                _visualizer.ShowStep(step, model, space);
+                yield return step;
+            }
         }
-
-        _visualizer.Clear();
+        finally
+        {
+            _visualizer.Clear();
+        }
     }
 }

@@ -1,11 +1,13 @@
 public sealed class MatchRunOptions
 {
-    public bool RunStepByStep { get; }
     public bool EnableVisualization { get; }
+    public bool EnableLogging { get; }
+    public int AlgorithmIndex { get; }
 
-    public MatchRunOptions(bool runStepByStep, bool enableVisualization)
+    public MatchRunOptions(bool enableVisualization, bool enableLogging, int algorithmIndex)
     {
-        RunStepByStep = runStepByStep;
         EnableVisualization = enableVisualization;
+        EnableLogging = enableLogging;
+        AlgorithmIndex = algorithmIndex;
     }
 }

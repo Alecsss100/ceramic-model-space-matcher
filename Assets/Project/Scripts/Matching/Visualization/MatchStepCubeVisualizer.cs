@@ -9,10 +9,14 @@ public class MatchStepCubeVisualizer : IMatchStepVisualizer
     readonly Material _rejectedMaterial;
     readonly Material _acceptedMaterial;
 
-    public MatchStepCubeVisualizer(Transform parent, int modelCount)
+    public MatchStepCubeVisualizer(
+        Transform parent,
+        int modelCount,
+        IVisualizationProjection projection,
+        VisualizationTransformRegistry transformRegistry)
     {
-        _modelPool = new CubePool(parent, modelCount, "MatchStepModelPool");
-        _markerPool = new CubePool(parent, 1, "MatchStepMarkerPool");
+        _modelPool = new CubePool(parent, modelCount, projection, transformRegistry, "MatchStepModelPool");
+        _markerPool = new CubePool(parent, 1, projection, transformRegistry, "MatchStepMarkerPool");
 
         _candidateMaterial = MaterialExtensions.CreateMaterial(MatchStepColors.Candidate);
         _skippedMaterial = MaterialExtensions.CreateMaterial(MatchStepColors.SkippedDuplicate);

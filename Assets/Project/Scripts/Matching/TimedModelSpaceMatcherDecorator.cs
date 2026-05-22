@@ -25,10 +25,17 @@ public sealed class TimedModelSpaceMatcherDecorator : IModelSpaceMatcher, IMatch
             yield return step;
     }
 
-    public IEnumerator PlayFindSteps(Matrix4x4[] model, Matrix4x4[] space, Action<MatchStep> onStep = null)
+    public IEnumerator PlayFindSteps(
+        Matrix4x4[] model,
+        Matrix4x4[] space,
+        Action<MatchStep> onStep = null,
+        Func<bool> shouldCancel = null)
     {
         foreach (var step in _inner.FindSteps(model, space))
         {
+            if (shouldCancel != null && shouldCancel())
+                yield break;
+
             onStep?.Invoke(step);
 
             if (_stepTiming == null)
@@ -37,6 +44,9 @@ public sealed class TimedModelSpaceMatcherDecorator : IModelSpaceMatcher, IMatch
             var delay = _stepTiming.GetDelay(step.Kind);
             if (delay > 0f)
                 yield return new WaitForSeconds(delay);
+
+            if (shouldCancel != null && shouldCancel())
+                yield break;
         }
     }
 }

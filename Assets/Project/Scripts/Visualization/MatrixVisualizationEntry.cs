@@ -1,12 +1,14 @@
 using UnityEngine;
+using VContainer;
 
 public class MatrixVisualizationEntry : MonoBehaviour
 {
     IMatrixVisualizer _visualizer;
 
-    void Awake()
+    [Inject]
+    public void Construct(IMatrixVisualizer visualizer)
     {
-        _visualizer = new CubeMatrixVisualizer();
+        _visualizer = visualizer;
     }
 
     void Start()

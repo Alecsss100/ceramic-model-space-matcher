@@ -4,9 +4,19 @@ using UnityEngine;
 public class CubePool
 {
     readonly List<GameObject> _cubes = new();
+    readonly IVisualizationProjection _projection;
+    readonly VisualizationTransformRegistry _transformRegistry;
 
-    public CubePool(Transform parent, int capacity, string name = "CubePool")
+    public CubePool(
+        Transform parent,
+        int capacity,
+        IVisualizationProjection projection,
+        VisualizationTransformRegistry transformRegistry,
+        string name = "CubePool")
     {
+        _projection = projection;
+        _transformRegistry = transformRegistry;
+
         var root = new GameObject(name).transform;
         root.SetParent(parent, false);
 
@@ -27,7 +37,10 @@ public class CubePool
     {
         var cube = _cubes[index];
         cube.SetActive(true);
-        cube.transform.SetPositionAndRotation(position, rotation);
+        _transformRegistry.Register(cube.transform, position, rotation);
+        cube.transform.SetPositionAndRotation(
+            _projection.ProjectPosition(position),
+            _projection.ProjectRotation(rotation));
         cube.transform.localScale = scale;
         cube.GetComponent<Renderer>().material = material;
     }

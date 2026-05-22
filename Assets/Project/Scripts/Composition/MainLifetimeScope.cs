@@ -4,8 +4,9 @@ using VContainer.Unity;
 
 public class MainLifetimeScope : LifetimeScope
 {
-    [SerializeField] bool _runStepByStep = true;
-    [SerializeField] bool _enableVisualization = true;
+    [SerializeField] MatchControlView _matchControlView;
+    [SerializeField] MatchProgressView _matchProgressView;
+    [SerializeField] MatchLogView _matchLogView;
 
     Transform _visualizationRoot;
 
@@ -20,31 +21,35 @@ public class MainLifetimeScope : LifetimeScope
 
     protected override void Configure(IContainerBuilder builder)
     {
-        builder.RegisterInstance(new MatchRunOptions(_runStepByStep, _enableVisualization));
-
-        builder.Register(resolver =>
-        {
-            var options = resolver.Resolve<MatchRunOptions>();
-            var inner = new OffsetModelSpaceMatcher();
-
-            if (options.EnableVisualization && options.RunStepByStep)
-            {
-                var visualizer = new MatchStepCubeVisualizer(_visualizationRoot, modelCount: 100);
-                var timed = new TimedModelSpaceMatcherDecorator(
-                    new VisualizingModelSpaceMatcherDecorator(inner, visualizer),
-                    new MatchStepTiming());
-                return new MatchContext(timed, timed);
-            }
-
-            return new MatchContext(inner);
-        }, Lifetime.Singleton);
+        builder.Register<MatchAlgorithmRegistry>(Lifetime.Singleton);
+        builder.Register<VisualizationTransformRegistry>(Lifetime.Singleton);
+        builder.Register<VisualizationModeController>(Lifetime.Singleton);
+        builder.Register<IVisualizationProjection>(
+            resolver => resolver.Resolve<VisualizationModeController>(),
+            Lifetime.Singleton);
+        builder.Register<IMatrixVisualizer>(
+            resolver => new CubeMatrixVisualizer(
+                resolver.Resolve<IVisualizationProjection>(),
+                resolver.Resolve<VisualizationTransformRegistry>()),
+            Lifetime.Singleton);
+        builder.Register(
+            resolver => new MatchContextFactory(
+                resolver.Resolve<MatchAlgorithmRegistry>(),
+                _visualizationRoot,
+                resolver.Resolve<IVisualizationProjection>(),
+                resolver.Resolve<VisualizationTransformRegistry>()),
+            Lifetime.Singleton);
 
         builder.RegisterComponentOnNewGameObject<MatrixMatchEntry>(
                 Lifetime.Singleton,
                 nameof(MatrixMatchEntry))
             .UnderTransform(transform);
-        builder.RegisterEntryPoint<MatrixMatchEntryPoint>();
-        Debug.Log("MatrixMatchEntry registered");
+
+        builder.RegisterComponent(_matchControlView);
+        builder.RegisterComponent(_matchProgressView);
+        builder.RegisterComponent(_matchLogView);
+        builder.RegisterComponentInHierarchy<MatrixVisualizationEntry>();
+
+        builder.RegisterEntryPoint<MatchControlPresenter>();
     }
-        
 }
