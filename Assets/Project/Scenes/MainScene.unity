@@ -148,11 +148,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e4b8f04fb69ed493a992fbe959cfb8b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MatrixMatchEntry
-  _stepTiming:
-    _candidate: 0.001
-    _skippedDuplicate: 0.001
-    _rejected: 0.001
-    _accepted: 5
   _runStepByStep: 1
   _enableVisualization: 1
 --- !u!4 &215543847

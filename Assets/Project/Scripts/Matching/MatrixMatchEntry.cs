@@ -11,7 +11,7 @@ public class MatrixMatchEntry : MonoBehaviour
 
     void Awake()
     {
-        var inner = new BruteForceShiftModelSpaceMatcher();
+        var inner = new OffsetModelSpaceMatcher();
 
         if (_enableVisualization && _runStepByStep)
         {
