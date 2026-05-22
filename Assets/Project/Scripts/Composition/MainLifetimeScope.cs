@@ -7,6 +7,7 @@ public class MainLifetimeScope : LifetimeScope
     [SerializeField] MatchControlView _matchControlView;
     [SerializeField] MatchProgressView _matchProgressView;
     [SerializeField] MatchLogView _matchLogView;
+    [SerializeField] MatchJsonView _matchJsonView;
 
     Transform _visualizationRoot;
 
@@ -22,6 +23,8 @@ public class MainLifetimeScope : LifetimeScope
     protected override void Configure(IContainerBuilder builder)
     {
         builder.Register<MatchAlgorithmRegistry>(Lifetime.Singleton);
+        builder.Register<MatchResultJsonBuilder>(Lifetime.Singleton);
+        builder.Register<JsonFileSaver>(Lifetime.Singleton);
         builder.Register<VisualizationTransformRegistry>(Lifetime.Singleton);
         builder.Register<VisualizationModeController>(Lifetime.Singleton);
         builder.Register<IVisualizationProjection>(
@@ -48,6 +51,7 @@ public class MainLifetimeScope : LifetimeScope
         builder.RegisterComponent(_matchControlView);
         builder.RegisterComponent(_matchProgressView);
         builder.RegisterComponent(_matchLogView);
+        builder.RegisterComponent(_matchJsonView);
         builder.RegisterComponentInHierarchy<MatrixVisualizationEntry>();
 
         builder.RegisterEntryPoint<MatchControlPresenter>();

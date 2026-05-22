@@ -10,7 +10,10 @@ public class MatrixMatchEntry : MonoBehaviour
     bool _cancelRequested;
     Coroutine _runCoroutine;
     MatchContext _currentContext;
-    Action _onCompleted;
+    MatchResult _currentResult;
+    int _currentModelCount;
+    int _currentSpaceCount;
+    Action<MatchRunResult> _onCompleted;
 
     [Inject]
     public void Construct(MatchContextFactory contextFactory)
@@ -20,7 +23,7 @@ public class MatrixMatchEntry : MonoBehaviour
 
     public void Run(
         MatchRunOptions options,
-        Action onCompleted,
+        Action<MatchRunResult> onCompleted,
         Action<float> onProgressChanged = null,
         Action<string> onLog = null)
     {
@@ -32,6 +35,9 @@ public class MatrixMatchEntry : MonoBehaviour
         _onCompleted = onCompleted;
         var context = _contextFactory.Create(options);
         _currentContext = context;
+        _currentResult = new MatchResult();
+        _currentModelCount = 0;
+        _currentSpaceCount = 0;
 
         if (options.EnableVisualization)
             _runCoroutine = StartCoroutine(RunStepByStep(context, options, onProgressChanged, onLog));
@@ -52,7 +58,7 @@ public class MatrixMatchEntry : MonoBehaviour
             _runCoroutine = null;
         }
 
-        CompleteRun();
+        CompleteRun(CreateCurrentRunResult());
     }
 
     void RunInstant(
@@ -63,8 +69,11 @@ public class MatrixMatchEntry : MonoBehaviour
     {
         var model = MatrixJsonLoader.Load("Data/model");
         var space = MatrixJsonLoader.Load("Data/space");
+        _currentModelCount = model.Length;
+        _currentSpaceCount = space.Length;
 
-        var acceptedCount = 0;
+        var result = new MatchResult();
+        _currentResult = result;
 
         if (options.EnableLogging)
         {
@@ -73,7 +82,7 @@ public class MatrixMatchEntry : MonoBehaviour
                 onProgressChanged?.Invoke(GetStepProgress(step, space.Length));
 
                 if (TrackStepLog(step, true, onLog))
-                    acceptedCount++;
+                    result.Offsets.Add(step.Offset);
 
                 if (_cancelRequested)
                     break;
@@ -81,12 +90,13 @@ public class MatrixMatchEntry : MonoBehaviour
         }
         else
         {
-            acceptedCount = context.Matcher.Find(model, space).Offsets.Count;
+            result = context.Matcher.Find(model, space);
         }
 
+        _currentResult = result;
         onProgressChanged?.Invoke(1f);
-        Debug.Log($"{context.Matcher.Name}: смещений найдено — {acceptedCount}");
-        CompleteRun();
+        Debug.Log($"{context.Matcher.Name}: смещений найдено — {result.Offsets.Count}");
+        CompleteRun(CreateRunResult(context, model, space, result));
     }
 
     IEnumerator RunStepByStep(
@@ -97,8 +107,11 @@ public class MatrixMatchEntry : MonoBehaviour
     {
         var model = MatrixJsonLoader.Load("Data/model");
         var space = MatrixJsonLoader.Load("Data/space");
+        _currentModelCount = model.Length;
+        _currentSpaceCount = space.Length;
 
-        var acceptedCount = 0;
+        var result = new MatchResult();
+        _currentResult = result;
 
         if (context.StepPlayback != null)
         {
@@ -107,7 +120,7 @@ public class MatrixMatchEntry : MonoBehaviour
                 onProgressChanged?.Invoke(GetStepProgress(step, space.Length));
 
                 if (TrackStepLog(step, options.EnableLogging, onLog))
-                    acceptedCount++;
+                    result.Offsets.Add(step.Offset);
             }, () => _cancelRequested);
         }
         else
@@ -117,27 +130,55 @@ public class MatrixMatchEntry : MonoBehaviour
                 onProgressChanged?.Invoke(GetStepProgress(step, space.Length));
 
                 if (TrackStepLog(step, options.EnableLogging, onLog))
-                    acceptedCount++;
+                    result.Offsets.Add(step.Offset);
 
                 if (_cancelRequested)
                     break;
             }
         }
 
+        _currentResult = result;
         _runCoroutine = null;
         onProgressChanged?.Invoke(_cancelRequested ? 0f : 1f);
-        Debug.Log($"{context.Matcher.Name}: пошаговый режим завершен, смещений найдено — {acceptedCount}");
-        CompleteRun();
+        Debug.Log($"{context.Matcher.Name}: пошаговый режим завершен, смещений найдено — {result.Offsets.Count}");
+        CompleteRun(CreateRunResult(context, model, space, result));
     }
 
-    void CompleteRun()
+    void CompleteRun(MatchRunResult runResult)
     {
         _isRunning = false;
         _runCoroutine = null;
         _currentContext?.Cleanup?.Invoke();
         _currentContext = null;
-        _onCompleted?.Invoke();
+        _currentResult = null;
+        _currentModelCount = 0;
+        _currentSpaceCount = 0;
+        _onCompleted?.Invoke(runResult);
         _onCompleted = null;
+    }
+
+    MatchRunResult CreateCurrentRunResult()
+    {
+        return new MatchRunResult(
+            _currentContext?.Matcher.Name,
+            _currentModelCount,
+            _currentSpaceCount,
+            _cancelRequested,
+            _currentResult ?? new MatchResult());
+    }
+
+    MatchRunResult CreateRunResult(
+        MatchContext context,
+        Matrix4x4[] model,
+        Matrix4x4[] space,
+        MatchResult result)
+    {
+        return new MatchRunResult(
+            context.Matcher.Name,
+            model?.Length ?? 0,
+            space?.Length ?? 0,
+            _cancelRequested,
+            result ?? new MatchResult());
     }
 
     static bool TrackStepLog(MatchStep step, bool enableLogging, Action<string> onLog)

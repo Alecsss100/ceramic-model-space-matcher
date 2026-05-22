@@ -9,11 +9,13 @@ public class MatchControlView : MonoBehaviour
     [SerializeField] Button _view2DButton;
     [SerializeField] Button _view3DButton;
     [SerializeField] Button _runButton;
+    [SerializeField] Button _saveJsonButton;
     [SerializeField] Toggle _visualizeToggle;
     [SerializeField] Toggle _loggingToggle;
     [SerializeField] TMP_Dropdown _algorithmDropdown;
 
     public event Action RunClicked;
+    public event Action SaveJsonClicked;
     public event Action View2DClicked;
     public event Action View3DClicked;
 
@@ -24,6 +26,7 @@ public class MatchControlView : MonoBehaviour
     void OnEnable()
     {
         _runButton?.onClick.AddListener(OnRunClicked);
+        _saveJsonButton?.onClick.AddListener(OnSaveJsonClicked);
         _view2DButton?.onClick.AddListener(OnView2DClicked);
         _view3DButton?.onClick.AddListener(OnView3DClicked);
     }
@@ -31,6 +34,7 @@ public class MatchControlView : MonoBehaviour
     void OnDisable()
     {
         _runButton?.onClick.RemoveListener(OnRunClicked);
+        _saveJsonButton?.onClick.RemoveListener(OnSaveJsonClicked);
         _view2DButton?.onClick.RemoveListener(OnView2DClicked);
         _view3DButton?.onClick.RemoveListener(OnView3DClicked);
     }
@@ -63,7 +67,14 @@ public class MatchControlView : MonoBehaviour
             _view3DButton.interactable = true;
     }
 
+    public void SetSaveJsonEnabled(bool enabled)
+    {
+        if (_saveJsonButton != null)
+            _saveJsonButton.interactable = enabled;
+    }
+
     void OnRunClicked() => RunClicked?.Invoke();
+    void OnSaveJsonClicked() => SaveJsonClicked?.Invoke();
     void OnView2DClicked() => View2DClicked?.Invoke();
     void OnView3DClicked() => View3DClicked?.Invoke();
 }
