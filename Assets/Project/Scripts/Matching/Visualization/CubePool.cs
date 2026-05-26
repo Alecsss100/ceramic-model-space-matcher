@@ -42,7 +42,7 @@ public class CubePool
             _projection.ProjectPosition(position),
             _projection.ProjectRotation(rotation));
         cube.transform.localScale = scale;
-        cube.GetComponent<Renderer>().material = material;
+        cube.GetComponent<Renderer>().sharedMaterial = material;
     }
 
     public void SetActiveCount(int count)

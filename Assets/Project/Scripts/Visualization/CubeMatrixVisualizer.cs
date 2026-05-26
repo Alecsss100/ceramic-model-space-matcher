@@ -13,12 +13,10 @@ public class CubeMatrixVisualizer : IMatrixVisualizer
         _transformRegistry = transformRegistry;
     }
 
-    public Transform Visualize(Transform parent, Matrix4x4[] matrices, Color color)
+    public Transform Visualize(Transform parent, Matrix4x4[] matrices, Material material)
     {
         var root = new GameObject($"Visualized ({matrices.Length})").transform;
         root.SetParent(parent, false);
-
-        var material = MaterialExtensions.CreateMaterial(color);
 
         for (var i = 0; i < matrices.Length; i++)
         {
@@ -34,7 +32,7 @@ public class CubeMatrixVisualizer : IMatrixVisualizer
             cube.transform.SetParent(root, false);
 
             Object.Destroy(cube.GetComponent<BoxCollider>());
-            cube.GetComponent<Renderer>().material = material;
+            cube.GetComponent<Renderer>().sharedMaterial = material;
         }
 
         return root;

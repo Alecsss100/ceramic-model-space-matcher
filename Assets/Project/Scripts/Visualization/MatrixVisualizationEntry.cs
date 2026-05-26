@@ -19,7 +19,8 @@ public class MatrixVisualizationEntry : MonoBehaviour
         var modelRoot = new GameObject("Model").transform;
         var spaceRoot = new GameObject("Space").transform;
 
-        _visualizer.Visualize(modelRoot, model, Color.orange);
-        _visualizer.Visualize(spaceRoot, space, Color.whiteSmoke);
+        var materials = VisualizationMaterialLibrary.Instance;
+        _visualizer.Visualize(modelRoot, model, materials.Model);
+        _visualizer.Visualize(spaceRoot, space, materials.Space);
     }
 }

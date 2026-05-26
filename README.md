@@ -4,6 +4,16 @@ Unity-проект: ищем все смещения массива матриц
 
 Unity 6, URP, VContainer, Newtonsoft.Json, TextMesh Pro.
 
+**Попробовать онлайн:** [CeramicTest3d на itch.io](https://alecsss100.itch.io/ceramictest3d) — WebGL-билд, можно запустить в браузере без установки Unity.
+
+## Как выглядит
+
+Слева — панель управления (алгоритм, запуск, прогресс, лог), справа — JSON с результатом, на сцене — кубы model/space и подсветка шагов поиска.
+
+<p align="center">
+  <img src="docs/app-screenshot.png" alt="Интерфейс приложения" width="900">
+</p>
+
 ---
 
 ## Задача
@@ -67,3 +77,9 @@ offset * model[i] ∈ space   для всех i
 | Красный | Не подошло |
 | Зелёный | Смещение найдено |
 | Чёрный | Дубликат offset, маркер на точке space |
+
+---
+
+## WebGL-билд
+
+Интерактивную версию можно запустить в браузере: **[alecsss100.itch.io/ceramictest3d](https://alecsss100.itch.io/ceramictest3d)**

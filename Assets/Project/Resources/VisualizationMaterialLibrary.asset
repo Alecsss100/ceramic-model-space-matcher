@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8c2e9a14b7d6e8439a1c5f2d0e8b4a6, type: 3}
+  m_Name: VisualizationMaterialLibrary
+  m_EditorClassIdentifier: 
+  _modelMaterial: {fileID: 2100000, guid: 5353030ee7bdcf242accfa312e46c00c, type: 2}
+  _spaceMaterial: {fileID: 2100000, guid: 614b202517b9c634a8d513a294e56cb2, type: 2}
+  _stepCheckMaterial: {fileID: 2100000, guid: cfa38f188a62b7842800f4a795b98a7f, type: 2}
+  _stepStoredMaterial: {fileID: 2100000, guid: 730e658a42b35aa48a62e1c84c4f4ea1, type: 2}
+  _stepFailedMaterial: {fileID: 2100000, guid: 72444144a0027b24a998362d6cdc8703, type: 2}
+  _stepAcceptedMaterial: {fileID: 2100000, guid: ea74c0cba875e5c4884a15bcfb8e00a9, type: 2}

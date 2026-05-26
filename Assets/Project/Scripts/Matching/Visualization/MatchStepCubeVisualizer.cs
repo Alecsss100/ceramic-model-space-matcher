@@ -4,10 +4,7 @@ public class MatchStepCubeVisualizer : IMatchStepVisualizer
 {
     readonly CubePool _modelPool;
     readonly CubePool _markerPool;
-    readonly Material _candidateMaterial;
-    readonly Material _skippedMaterial;
-    readonly Material _rejectedMaterial;
-    readonly Material _acceptedMaterial;
+    readonly VisualizationMaterialLibrary _materials;
 
     public MatchStepCubeVisualizer(
         Transform parent,
@@ -15,13 +12,9 @@ public class MatchStepCubeVisualizer : IMatchStepVisualizer
         IVisualizationProjection projection,
         VisualizationTransformRegistry transformRegistry)
     {
+        _materials = VisualizationMaterialLibrary.Instance;
         _modelPool = new CubePool(parent, modelCount, projection, transformRegistry, "MatchStepModelPool");
         _markerPool = new CubePool(parent, 1, projection, transformRegistry, "MatchStepMarkerPool");
-
-        _candidateMaterial = MaterialExtensions.CreateMaterial(MatchStepColors.Candidate);
-        _skippedMaterial = MaterialExtensions.CreateMaterial(MatchStepColors.SkippedDuplicate);
-        _rejectedMaterial = MaterialExtensions.CreateMaterial(MatchStepColors.Rejected);
-        _acceptedMaterial = MaterialExtensions.CreateMaterial(MatchStepColors.Accepted);
     }
 
     public void ShowStep(MatchStep step, Matrix4x4[] model, Matrix4x4[] space)
@@ -32,16 +25,12 @@ public class MatchStepCubeVisualizer : IMatchStepVisualizer
         switch (step.Kind)
         {
             case MatchStepKind.Candidate:
-                ShowShiftedModel(step.Offset, model, _candidateMaterial);
-                break;
             case MatchStepKind.Rejected:
-                ShowShiftedModel(step.Offset, model, _rejectedMaterial);
-                break;
             case MatchStepKind.Accepted:
-                ShowShiftedModel(step.Offset, model, _acceptedMaterial);
+                ShowShiftedModel(step.Offset, model, _materials.GetStepMaterial(step.Kind));
                 break;
             case MatchStepKind.SkippedDuplicate:
-                ShowSpaceMarker(step.SpaceIndex, space, _skippedMaterial);
+                ShowSpaceMarker(step.SpaceIndex, space, _materials.GetStepMaterial(step.Kind));
                 break;
         }
     }
